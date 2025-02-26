@@ -1,0 +1,39 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignore": ["node_modules/**/*", "routeTree.gen.ts", "./packages/ui/src/common/**/*"]
+	},
+	"formatter": {
+		"lineWidth": 120,
+		"useEditorconfig": true,
+		"formatWithErrors": true
+	},
+	"organizeImports": {
+		"enabled": true
+	},
+	"javascript": {
+		"formatter": {
+			"trailingCommas": "none",
+			"attributePosition": "multiline",
+			"semicolons": "asNeeded"
+		}
+	},
+	"json": {
+		"parser": {
+			"allowComments": true
+		}
+	},
+	"linter": {
+		"rules": {
+			"a11y": {
+				"useKeyWithClickEvents": "off",
+				"useButtonType": "off"
+			}
+		}
+	}
+}

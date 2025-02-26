@@ -1,0 +1,97 @@
+{
+	"menu": {
+		"home": "Home",
+		"search": "Search",
+		"askAi": "Ask AI",
+		"collections": "Works Collection",
+		"realms": "Worldbuilding",
+		"characters": "Character Archive",
+		"charactersCreate": "Character Create",
+		"charactersUpdate": "Character Update",
+		"charactersDetail": "Character Detail",
+		"helpCenter": "Help Center"
+	},
+	"settingMenu": {
+		"appearance": "Appearance",
+		"assistantAI": "Assistant AI",
+		"editor": "Editor",
+		"keyboardShortcuts": "Keyboard Shortcuts"
+	},
+	"settings": {
+		"title": "Setting",
+		"description": "Customize your settings here."
+	},
+	"reset": {
+		"now": "Reset Now",
+		"allSettings": "Reset All Settings",
+		"allSettingsDesc": "Reset all settings to default values",
+		"confirmTitle": "Are you sure you want to reset all settings?",
+		"confirmDesc": "This action is irreversible and will restore all settings to their default values. Your current preferences will be lost."
+	},
+	"appearance": {
+		"title": "Appearance",
+		"description": "Customize the appearance of Novelist.",
+		"colorMode": {
+			"title": "Colour mode",
+			"description": "Choose your colour mode."
+		}
+	},
+	"theme": {
+		"title": "Theme",
+		"label": "theme",
+		"options": {
+			"system": "System",
+			"dark": "dark",
+			"light": "light"
+		}
+	},
+	"features": {
+		"ai": {
+			"title": "Assistant AI",
+			"description": "Set up and personalize your Assistant AI."
+		},
+		"editor": {
+			"title": "Editor",
+			"description": "Configure settings for your editor."
+		},
+		"shortcuts": {
+			"title": "Keyboard Shortcuts",
+			"description": "Quickly view and manage keyboard shortcuts."
+		}
+	},
+	"language": {
+		"display": "Display language",
+		"selectDesc": "Select the language for the interface.",
+		"local": "Local"
+	},
+	"common": {
+		"cancel": "Cancel",
+		"reset": "Reset",
+		"system": "system",
+		"System": "System",
+		"logOut": "Log Out",
+		"signIn": "Sign In",
+		"upgradePro": "Upgrade to Pro"
+	},
+	"error": {
+		"403": {
+			"code": "403",
+			"title": "Access Forbidden",
+			"description": "You don't have necessary permission to view this resource."
+		},
+		"404": {
+			"code": "404",
+			"title": "Oops! Page Not Found!",
+			"description": "It seems like the page you're looking for does not exist or might have been removed."
+		},
+		"500": {
+			"code": "500",
+			"title": "Oops! Something went wrong :)",
+			"description": "We apologize for the inconvenience. Please try again later."
+		},
+		"buttons": {
+			"goBack": "Go Back",
+			"backToHome": "Back to Home"
+		}
+	}
+}

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <style id="loader-style">
+      :root {
+        --loader-wrapper-bg: #fff;
+        --loader-bg: #000;
+        --loader-shadow: rgba(0, 0, 0, 0.4);
+      }
+      html.dark {
+        --loader-wrapper-bg: #000;
+        --loader-bg: #fff;
+        --loader-shadow: rgba(255, 255, 255, 0.4);
+      }
+      #loading-wrapper {
+        position: fixed;
+        z-index: 999;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--loader-wrapper-bg);
+      }
+      #loading-wrapper.hidden {
+        pointer-events: none;
+        visibility: hidden;
+        opacity: 0;
+        transition: all 0.8s ease-out;
+      }
+      #loading-spin {
+        width: 20px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background-color: var(--loader-bg);
+        box-shadow: 0 0 0 0 var(--loader-shadow);
+        animation: l2 1.5s infinite linear;
+        position: relative;
+      }
+      #loading-spin:before,
+      #loading-spin:after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        box-shadow: 0 0 0 0 var(--loader-shadow);
+        animation: inherit;
+        animation-delay: -0.5s;
+      }
+      #loading-spin:after {
+        animation-delay: -1s;
+      }
+      @keyframes l2 {
+        100% {
+          box-shadow: 0 0 0 40px transparent;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading-wrapper">
+      <div id="loading-spin"></div>
+    </div>
+
+    <script id="loading-script">
+      let theme =
+        JSON.parse(localStorage.getItem("themeModeKey") || '""') || "light";
+      if (theme === "system") {
+        theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+      }
+
+      document.documentElement.setAttribute("class", `${theme}`);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,48 @@
+{
+	"name": "@novelist/frontend",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"description": "Novelist web frontend.",
+	"author": "Seventhse <season.sevent@icloud.com> (https://github.com/seventhse)",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"@clerk/clerk-react": "5.21.2",
+		"@clerk/localizations": "3.9.7",
+		"@dnd-kit/core": "6.3.1",
+		"@dnd-kit/modifiers": "9.0.0",
+		"@dnd-kit/sortable": "10.0.0",
+		"@dnd-kit/utilities": "3.2.2",
+		"@hookform/resolvers": "3.10.0",
+		"@novelist/endpoint": "workspace:*",
+		"@novelist/locales": "workspace:*",
+		"@novelist/ui": "workspace:*",
+		"@novelist/utils": "workspace:*",
+		"@tanstack/query-core": "5.64.1",
+		"@tanstack/react-query": "5.64.1",
+		"@tanstack/react-router": "1.95.2",
+		"axios": "1.7.9",
+		"jotai": "2.11.0",
+		"jotai-tanstack-query": "0.9.0",
+		"motion": "11.18.0",
+		"nanoid": "catalog:",
+		"react-hook-form": "7.54.2",
+		"zod": "3.24.1"
+	},
+	"devDependencies": {
+		"@internal/tailwind-config": "workspace:*",
+		"@internal/tsconfig": "workspace:*",
+		"@internal/vite-config": "workspace:*",
+		"@novelist/models": "workspace:*",
+		"@tanstack/react-query-devtools": "5.64.1",
+		"@tanstack/router-devtools": "1.95.2",
+		"@tanstack/router-plugin": "1.95.2",
+		"@vitejs/plugin-react-swc": "3.7.2",
+		"react": "catalog:",
+		"react-dom": "catalog:"
+	}
+}

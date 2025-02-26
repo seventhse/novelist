@@ -1,0 +1,5 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"extends": "@internal/tsconfig/web",
+	"include": ["./src/**/*.ts", "./src/**/*.tsx"]
+}

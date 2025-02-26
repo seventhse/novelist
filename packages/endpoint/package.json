@@ -1,0 +1,14 @@
+{
+	"name": "@novelist/endpoint",
+	"version": "0.0.1",
+	"description": "Shared Data endpoint function for the Novelist project",
+	"author": "Seventhse <season.sevent@icloud.com> (https://github.com/seventhse)",
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
+	"files": ["src"],
+	"dependencies": {
+		"idb": "8.0.1",
+		"nanoid": "catalog:",
+		"dayjs": "catalog:"
+	}
+}

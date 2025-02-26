@@ -1,0 +1,39 @@
+{
+	"name": "novelist",
+	"version": "0.0.1",
+	"private": true,
+	"description": "Novelist editor platform monorepo.",
+	"scripts": {
+		"preinstall": "npx only-allow pnpm",
+		"postinstall": "lefthook install",
+		"lint": "biome lint ./",
+		"lint:fix": "biome lint ./ --fix --unsafe",
+		"format": "biome format --write ./",
+		"format:fix": "biome format --write ./ --fix"
+	},
+	"keywords": ["editor"],
+	"author": "Seventhse <season.sevent@icloud.com> (https://github.com/seventhse)",
+	"license": "MIT",
+	"devDependencies": {
+		"@biomejs/biome": "catalog:",
+		"@internal/tailwind-config": "workspace:*",
+		"@internal/tsconfig": "workspace:*",
+		"@novelist/models": "workspace:*",
+		"@types/node": "catalog:",
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
+		"@vitest/ui": "catalog:",
+		"autoprefixer": "catalog:",
+		"lefthook": "catalog:",
+		"postcss": "catalog:",
+		"tailwindcss": "catalog:",
+		"typescript": "catalog:",
+		"unbuild": "catalog:",
+		"vite": "catalog:",
+		"vitest": "catalog:"
+	},
+	"engines": {
+		"node": ">=20.10.0",
+		"pnpm": ">=9.12.0"
+	}
+}

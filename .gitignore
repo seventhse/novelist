@@ -1,0 +1,33 @@
+dist
+/target
+
+.env
+.env.local
+.DS_Store
+
+# Nx
+.nx
+
+# PNPM
+.pnpm-store/
+node_modules/
+.pnpm-debug.log
+
+# Node.js
+package-lock.json
+.pnp.*
+.npm
+.node_repl_history
+
+# IDE/Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+
+
+.nx/cache
+.nx/workspace-data
+vite.config.*.timestamp*
+vitest.config.*.timestamp*

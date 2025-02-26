@@ -1,0 +1,12 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"extends": "./tsconfig.web.json",
+	"compilerOptions": {
+		"moduleResolution": "bundler", // or "nodenext" or "bundler"
+		"jsx": "react-jsx",
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"module": "ESNext",
+		"target": "ESNext"
+	}
+}

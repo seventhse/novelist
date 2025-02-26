@@ -1,0 +1,94 @@
+{
+	"menu": {
+		"home": "首页",
+		"search": "搜索",
+		"askAi": "AI助手",
+		"collections": "作品合集",
+		"realms": "世界设定",
+		"characters": "角色档案",
+		"helpCenter": "帮助中心"
+	},
+	"settingMenu": {
+		"appearance": "外观",
+		"assistantAI": "AI助手",
+		"editor": "编辑器",
+		"keyboardShortcuts": "键盘快捷键"
+	},
+	"settings": {
+		"title": "设置",
+		"description": "在这里自定义您的设置。"
+	},
+	"appearance": {
+		"title": "外观",
+		"description": "自定义 Novelist 的外观。",
+		"colorMode": {
+			"title": "颜色模式",
+			"description": "选择你的颜色模式。"
+		}
+	},
+	"reset": {
+		"now": "立即重置",
+		"allSettings": "重置所有设置",
+		"allSettingsDesc": "将所有设置重置为默认值",
+		"confirmTitle": "确定要重置所有设置吗？",
+		"confirmDesc": "此操作不可逆，将恢复所有设置为默认值。您当前的偏好设置将会丢失。"
+	},
+	"theme": {
+		"title": "主题",
+		"label": "主题",
+		"options": {
+			"system": "系统",
+			"dark": "暗色",
+			"light": "亮色"
+		}
+	},
+	"features": {
+		"ai": {
+			"title": "AI助手",
+			"description": "设置和个性化您的AI助手。"
+		},
+		"editor": {
+			"title": "编辑器",
+			"description": "配置编辑器设置。"
+		},
+		"shortcuts": {
+			"title": "键盘快捷键",
+			"description": "快速查看和管理键盘快捷键。"
+		}
+	},
+	"language": {
+		"display": "显示语言",
+		"selectDesc": "选择界面语言。",
+		"local": "本地"
+	},
+	"common": {
+		"cancel": "取消",
+		"reset": "重置",
+		"system": "系统",
+		"System": "系统",
+		"logOut": "登出",
+		"signIn": "登录",
+		"upgradePro": "升级到专业版"
+	},
+	"error": {
+		"403": {
+			"code": "403",
+			"title": "访问被禁止",
+			"description": "您没有查看此资源所需的权限。"
+		},
+		"404": {
+			"code": "404",
+			"title": "糟糕！页面未找到！",
+			"description": "您访问的页面似乎不存在或已被移除。"
+		},
+		"500": {
+			"code": "500",
+			"title": "糟糕！出错了 :)",
+			"description": "抱歉给您带来不便。请稍后再试。"
+		},
+		"buttons": {
+			"goBack": "返回上页",
+			"backToHome": "返回首页"
+		}
+	}
+}
