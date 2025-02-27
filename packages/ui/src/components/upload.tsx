@@ -1,4 +1,16 @@
-import { safeArray } from "@novelist/utils"
+import {
+  type Awaitable,
+  byFileGenerateURL,
+  checkFileSize,
+  checkFileType,
+  isBoolean,
+  randomIdWithAny,
+  safeArray,
+  stringToHash,
+  useDebounceCallback,
+  useEvent,
+  useMergedState
+} from "@novelist/utils"
 import { Slot } from "@radix-ui/react-slot"
 import {
   type ChangeEvent,
@@ -12,26 +24,117 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
-  useState
+  useRef
 } from "react"
 import { cn } from "../lib/utils"
 
+export type UploadFileStatus = "ready" | "fail"
+
+export type UploadError = {
+  type: "minSize" | "maxSize" | "accept" | "custom"
+  message: string
+  file?: UploadFile
+}
+
 export interface UploadFile {
+  uid: string
   name: string
+  url: string
   raw: File
-  size: number
+  size?: number
+  status?: UploadFileStatus
+  check?: "minSize" | "maxSize" | "accept" | "custom"
 }
 
 interface UploadState {
   files: UploadFile[]
   setFiles: Dispatch<SetStateAction<UploadFile[]>>
+  remove: (file: UploadFile | string) => void
   accept?: string | string[]
   multiple?: boolean
   drag?: boolean
-  maxSize?: number | ((file: UploadFile) => boolean)
+  minSize?: number | ((file: File) => boolean)
+  maxSize?: number | ((file: File) => boolean)
   onChange?: (file: UploadFile[]) => void
-  onError?: (error: Error) => void
+  onError?: (error: UploadError[]) => void
+  onBeforeSelect?: (file: FileList) => Awaitable<File[] | FileList | boolean>
+  validator?: (file: File) => Awaitable<boolean>
+}
+
+function transformToUploadFile(file: File, status: UploadFileStatus = "ready", type?: UploadFile["check"]) {
+  return {
+    uid: randomIdWithAny(stringToHash(file.name).slice(0, 10)),
+    name: file.name,
+    size: file.size,
+    raw: file,
+    url: byFileGenerateURL(file),
+    type,
+    status
+  }
+}
+
+function transformToUploadFiles(
+  fileList: FileList | File[],
+  status: UploadFile["status"] = "ready",
+  type?: UploadFile["check"]
+): UploadFile[] {
+  return Array.from(fileList).map((file) => transformToUploadFile(file, status, type))
+}
+
+function generatorUploadError(type: UploadError["type"], message: string, file: File) {
+  return {
+    type,
+    message,
+    file: transformToUploadFile(file, "fail", type)
+  }
+}
+
+function generatorUploadErrors(type: UploadError["type"], message: string, files: File[]) {
+  return Array.from(files).map((file) => generatorUploadError(type, message, file))
+}
+
+async function validFile(
+  fileList: FileList | File[],
+  options: Pick<UploadProps, "accept" | "minSize" | "maxSize" | "validator">
+) {
+  const { accept, maxSize, minSize, validator } = options
+  let resultFiles: File[] = []
+  const errorFiles: UploadError[] = []
+
+  if (accept) {
+    const typeResult = checkFileType(accept, fileList)
+    resultFiles = typeResult.validFiles
+    errorFiles.push(...generatorUploadErrors("accept", "File type is not match.", typeResult.failFiles))
+  }
+
+  if (minSize) {
+    const minSizeResult = checkFileSize(minSize, resultFiles)
+    resultFiles = minSizeResult.validFiles
+    errorFiles.push(...generatorUploadErrors("minSize", "File size lt upload min size.", minSizeResult.failFiles))
+  }
+
+  if (maxSize) {
+    const { validFiles, failFiles } = checkFileSize(maxSize, resultFiles)
+    resultFiles = validFiles
+    errorFiles.push(...generatorUploadErrors("maxSize", "File size gt upload max size.", failFiles))
+  }
+
+  if (validator) {
+    const validatedFiles: File[] = []
+    for (const file of resultFiles) {
+      if (!(await validator(file))) {
+        errorFiles.push(generatorUploadError("custom", "Custom validator error.", file))
+      } else {
+        validatedFiles.push(file)
+      }
+    }
+    resultFiles = validatedFiles
+  }
+
+  return {
+    resultFiles,
+    errorFiles
+  }
 }
 
 const UploadContext = createContext<UploadState | undefined>(undefined)
@@ -46,50 +149,64 @@ export function useUploadContext() {
   return context
 }
 
-export interface UploadProps extends Omit<UploadState, "files" | "setFiles"> {
+export interface UploadProps extends Omit<UploadState, "files" | "setFiles" | "remove"> {
+  fileList?: UploadFile[]
   className?: string
   asChild?: boolean
 }
 
 export function Upload({
+  fileList,
   asChild,
   children,
   accept = "*",
   multiple = false,
   drag = true,
-  maxSize = 1024 * 1024,
+  minSize,
+  maxSize,
   onChange,
   onError,
-  className
+  className,
+  validator,
+  onBeforeSelect
 }: PropsWithChildren<UploadProps>) {
-  const [files, setFiles] = useState<UploadFile[]>([])
+  const [files, setFiles] = useMergedState<UploadFile[]>([], {
+    value: fileList,
+    onChange(value) {
+      onChange?.(value)
+    }
+  })
 
   const filesRef = useRef(files)
+
   useEffect(() => {
     filesRef.current = files
   }, [files])
 
-  const setFilesAction = useCallback<Dispatch<SetStateAction<UploadFile[]>>>(
-    (fileList) => {
-      const newFiles = typeof fileList === "function" ? fileList(filesRef.current) : fileList
-      onChange?.(newFiles)
-      setFiles(fileList)
+  const remove = useCallback(
+    (file: UploadFile | string) => {
+      const uid = typeof file === "string" ? file : file.uid
+      setFiles((pre) => pre.filter((item) => item.uid !== uid))
     },
-    [onChange]
+    [setFiles]
   )
 
   const state = useMemo<UploadState>(() => {
     return {
       files,
-      setFiles: setFilesAction,
+      setFiles,
+      remove,
       accept,
       multiple,
       drag,
+      minSize,
       maxSize,
       onChange,
-      onError
+      onError,
+      validator,
+      onBeforeSelect
     }
-  }, [files, setFilesAction, accept, multiple, drag, maxSize, onChange, onError])
+  }, [files, setFiles, remove, accept, multiple, drag, minSize, maxSize, onChange, onError, validator, onBeforeSelect])
 
   const Com = asChild ? Slot : "div"
 
@@ -100,67 +217,78 @@ export function Upload({
   )
 }
 
-export interface UploadTriggerProps extends Omit<ComponentProps<"input">, "type" | "accept" | "multiple"> {
-  asChild?: boolean
-}
+export interface UploadTriggerProps extends Omit<ComponentProps<"input">, "type" | "accept" | "multiple"> {}
 
-export function UploadTrigger({ asChild, children, ...restProps }: PropsWithChildren<UploadTriggerProps>) {
-  const context = useContext(UploadContext)
-  if (!context) {
-    throw new Error("UploadTrigger must be used within Upload")
-  }
+export function UploadTrigger({ children, className, ...restProps }: PropsWithChildren<UploadTriggerProps>) {
+  const context = useUploadContext()
 
-  const { setFiles, multiple, maxSize, onError } = context
+  const { setFiles, multiple, maxSize, minSize, onError, validator, onBeforeSelect } = context
 
   const accept = useMemo(() => {
     return safeArray(context.accept).join(",")
   }, [context.accept])
 
-  const validateAndProcessFiles = useCallback(
-    (fileList: FileList): UploadFile[] => {
-      if (accept) {
-        const { validFiles, errorFiles } = checkFileType(accept, fileList)
-        if (errorFiles.length > 0) {
-          onError?.(new Error("Upload file invalid error."))
-          return transformToUploadFile(validFiles)
+  const validateAndProcessFiles = useEvent(async (fileList: FileList | File[]): Promise<UploadFile[]> => {
+    const { resultFiles, errorFiles } = await validFile(fileList, {
+      accept: context.accept,
+      maxSize: maxSize,
+      minSize: minSize,
+      validator: validator
+    })
+
+    if (errorFiles.length) {
+      onError?.(errorFiles)
+    }
+
+    const returnErrorFile = errorFiles
+      .map((error) => {
+        if (!error.file) {
+          return null
         }
+        return error.file
+      })
+      .filter((item) => item) as UploadFile[]
+
+    return [...transformToUploadFiles(resultFiles), ...returnErrorFile]
+  })
+
+  const handleFiles = useEvent(async (fileList: FileList) => {
+    if (!fileList.length) {
+      return
+    }
+
+    let validFiles: UploadFile[] = []
+    if (onBeforeSelect) {
+      const val = await onBeforeSelect?.(fileList)
+      if (!val) {
+        return
       }
+      validFiles = await validateAndProcessFiles(isBoolean(val) ? fileList : val)
+    } else {
+      validFiles = await validateAndProcessFiles(fileList)
+    }
 
-      if (maxSize) {
-      }
+    if (multiple) {
+      setFiles((pre) => [...pre, ...validFiles])
+    } else {
+      setFiles(validFiles.slice(0, 1))
+    }
+  })
 
-      return transformToUploadFile(fileList)
-    },
-    [maxSize, accept, onError]
-  )
-
-  const handleFiles = useCallback(
-    (fileList: FileList) => {
-      const processedFiles = validateAndProcessFiles(fileList)
-
-      if (multiple) {
-        setFiles((pre) => [...pre, ...processedFiles])
-      } else {
-        setFiles(processedFiles.slice(0, 1))
-      }
-    },
-    [multiple, setFiles, validateAndProcessFiles]
-  )
-
-  const handleDrop = (ev: DragEvent<HTMLDivElement>) => {
+  const handleDrop = useDebounceCallback(async (ev: DragEvent<HTMLDivElement>) => {
     ev.preventDefault()
-    handleFiles(ev.dataTransfer.files)
-  }
+    await handleFiles(ev.dataTransfer.files)
+  }, 300)
 
-  const handleChange = (ev: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = async (ev: ChangeEvent<HTMLInputElement>) => {
     if (ev.target.files) {
-      handleFiles(ev.target.files)
+      await handleFiles(ev.target.files)
     }
   }
 
   return (
     <div
-      className="relative rounded-xl shadow-sm border-border border-2"
+      className={cn("relative rounded-xl shadow-sm border-border border-2", className)}
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
     >
@@ -169,6 +297,8 @@ export function UploadTrigger({ asChild, children, ...restProps }: PropsWithChil
         type="file"
         accept={accept}
         multiple={multiple}
+        aria-label="Choose file"
+        role="button"
         {...restProps}
         onChange={handleChange}
       />
@@ -177,49 +307,28 @@ export function UploadTrigger({ asChild, children, ...restProps }: PropsWithChil
   )
 }
 
-function checkFileType(accept: string, files: FileList) {
-  const allowedTypes = accept.split(",")
-  const validFiles: File[] = []
-  const errorFiles: File[] = []
-
-  for (const file of Array.from(files)) {
-    const fileType = file.type
-    if (allowedTypes.some((type) => fileType.match(new RegExp(type.replace("*", ".*"))))) {
-      validFiles.push(file)
-    } else {
-      errorFiles.push(file)
+export interface UploadPreviewProps {
+  asChild?: boolean
+  className?: string
+  renderItem: (
+    file: UploadFile,
+    actions: {
+      remove: UploadState["remove"]
     }
-  }
-
-  return {
-    validFiles,
-    errorFiles
-  }
+  ) => React.ReactNode
 }
 
-function checkFileSize(size: UploadProps["maxSize"], files: FileList) {
-  const validFiles: File[] = []
-  const errorFiles: File[] = []
+export function UploadPreview({ asChild, renderItem, className }: UploadPreviewProps) {
+  const Com = asChild ? Slot : "div"
+  const { files, remove } = useUploadContext()
 
-  const isFunction = typeof size === "function"
-
-  for (const file of Array.from(files)) {
-    if (isFunction) {
-    }
-  }
-
-  return {
-    validFiles,
-    errorFiles
-  }
-}
-
-function transformToUploadFile(fileList: FileList | File[]): UploadFile[] {
-  return Array.from(fileList).map((file) => {
-    return {
-      name: file.name,
-      size: file.size,
-      raw: file
-    }
-  })
+  return (
+    <Com className={cn("relative", className)}>
+      {files.map((file) =>
+        renderItem(file, {
+          remove
+        })
+      )}
+    </Com>
+  )
 }

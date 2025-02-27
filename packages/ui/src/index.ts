@@ -2,6 +2,7 @@
 
 export * from "./components/setting-section"
 export * from "./components/empty"
+export * from "./components/upload"
 export * from "./components/loading"
 export * from "./components/button"
 export * from "./components/wrapper"

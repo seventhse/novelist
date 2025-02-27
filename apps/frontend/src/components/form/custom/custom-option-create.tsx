@@ -7,7 +7,7 @@ export interface CustomOptionCreateProps extends Omit<HTMLAttributes<HTMLDivElem
   value?: string[]
   onChange?: (value: string[]) => void
   placeholder?: string
-  onError?: (e: Error) => void
+  onError?: (e: string) => void
 }
 
 interface Item {
@@ -65,7 +65,7 @@ export function CustomOptionCreate({
           console.log(internal)
           if (internal.includes(value)) {
             const msg = `${value} is exists.`
-            onError?.(new Error(msg))
+            onError?.(msg)
             return
           }
           const newData = [...internal, value]

@@ -1,11 +1,12 @@
 import { Input, Textarea } from "@novelist/ui"
 import type { ComponentPropsWithoutRef, ReactNode } from "react"
-import type { ControllerRenderProps } from "react-hook-form"
+import { type ControllerRenderProps, type UseFormReturn, useFormContext } from "react-hook-form"
 import { CustomOptionCreate, type CustomOptionCreateProps } from "../custom/custom-option-create"
 import { SimpleSelect, SimpleSelectGroup } from "../simple-field/simple-select"
 import type { SimpleSelectGroupProps, SimpleSelectProps } from "../simple-field/simple-select"
 import { SimpleUpload, type SimpleUploadProps } from "../simple-field/simple-upload"
 import type { DynamicFormFieldType } from "./constant"
+import { uploadErrorMessageHelper } from "./error-helper"
 
 type ControllerProps = Pick<ControllerRenderProps, "onChange" | "onBlur" | "value" | "name" | "ref">
 
@@ -41,13 +42,32 @@ export function isFieldType<T extends DynamicFormFieldType>(
 }
 
 type FieldComponents = {
-  [K in DynamicFormFieldType]: (props: Omit<FieldPropsMap[K], "type">) => ReactNode
+  [K in DynamicFormFieldType]: (props: Omit<FieldPropsMap[K], "type">, form: UseFormReturn) => ReactNode
 }
 
 const fieldComponents: FieldComponents = {
   input: (props) => <Input {...props} />,
   textarea: (props) => <Textarea {...props} />,
-  upload: (props) => <SimpleUpload {...props} />,
+  upload: (props, form) => (
+    <SimpleUpload
+      {...props}
+      fileList={props.value || []}
+      onChange={(value) => {
+        if (props.name) {
+          form.clearErrors(props.name)
+        }
+        if (props.onChange) {
+          props.onChange(value)
+        }
+      }}
+      onError={(errors) => {
+        form.setError(props.name as string, {
+          type: "manual",
+          message: uploadErrorMessageHelper(errors)
+        })
+      }}
+    />
+  ),
   select: (props) => (
     <SimpleSelect
       {...(props as unknown as SimpleSelectProps)}
@@ -62,7 +82,27 @@ const fieldComponents: FieldComponents = {
       defaultValue={props.value}
     />
   ),
-  "option-create": (props) => <CustomOptionCreate {...props} />
+  "option-create": (props, form) => (
+    <CustomOptionCreate
+      {...props}
+      onChange={(val) => {
+        if (props.name) {
+          form.clearErrors(props.name)
+        }
+        if (props.onChange) {
+          props.onChange(val)
+        }
+      }}
+      onError={(msg) => {
+        if (props.name) {
+          form.setError(props.name as string, {
+            type: "manual",
+            message: msg
+          })
+        }
+      }}
+    />
+  )
 } as const
 
 /**
@@ -84,6 +124,7 @@ const fieldComponents: FieldComponents = {
 export function DynamicFormField<T extends DynamicFormFieldType>(props: FieldPropsMap[T]) {
   const { type, ...restProps } = props
 
+  const form = useFormContext()
   const Component = fieldComponents[type] as FieldComponents[T]
 
   if (!Component) {
@@ -91,5 +132,5 @@ export function DynamicFormField<T extends DynamicFormFieldType>(props: FieldPro
     return null
   }
 
-  return Component(restProps)
+  return Component(restProps, form)
 }

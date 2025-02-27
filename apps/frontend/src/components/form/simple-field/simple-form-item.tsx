@@ -16,12 +16,7 @@ export function SimpleFormItem({
   message = true,
   children
 }: PropsWithChildren<SimpleFormItemProps>) {
-  const {
-    control,
-    setError,
-    clearErrors,
-    formState: { errors }
-  } = useFormContext()
+  const { control } = useFormContext()
 
   return (
     <FormField
@@ -31,23 +26,7 @@ export function SimpleFormItem({
         return (
           <FormItem>
             <FormLabel>{label}</FormLabel>
-            <FormControl
-              {...field}
-              onChange={(e) => {
-                if (errors) {
-                  clearErrors(field.name)
-                }
-                field.onChange(e)
-              }}
-              onError={(e) => {
-                setError(field.name, {
-                  type: "manual",
-                  message: (e as unknown as Error).message
-                })
-              }}
-            >
-              {children}
-            </FormControl>
+            <FormControl {...field}>{children}</FormControl>
             {description && <FormDescription>{description}</FormDescription>}
             {message && <FormMessage />}
           </FormItem>

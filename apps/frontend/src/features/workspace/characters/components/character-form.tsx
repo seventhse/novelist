@@ -47,7 +47,9 @@ export default function CharacterForm(props: CharacterFormProps) {
     <Form {...form}>
       <form
         className="size-full m-1 overflow-auto p-3"
-        onSubmit={form.handleSubmit((values) => {})}
+        onSubmit={form.handleSubmit((values) => {
+          console.log("form values:", values)
+        })}
       >
         <header className="sticky top-0 flex items-center justify-center p-2 shadow rounded-2xl bg-background">
           <div className="flex items-center">
@@ -90,9 +92,13 @@ export default function CharacterForm(props: CharacterFormProps) {
           <div className="flex-1 space-y-3">
             <SimpleFormItem
               name="avatar"
-              label="Character Avatar"
+              label="Character Photo"
             >
-              <SimpleUpload />
+              <SimpleUpload
+                onError={(e) => {
+                  form.setError("avatar", e[0]?.message || "")
+                }}
+              />
             </SimpleFormItem>
           </div>
           <div className="flex-1 flex flex-col gap-y-3">

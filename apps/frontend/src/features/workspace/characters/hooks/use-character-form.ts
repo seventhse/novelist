@@ -4,10 +4,12 @@ import { useFieldArray, useForm } from "react-hook-form"
 export function useCharacterForm() {
   const form = useForm<{
     name: string
+    avatar: []
     extendField: ExtendField[]
   }>({
     defaultValues: {
       name: "Undefined",
+      avatar: [],
       extendField: []
     }
   })
