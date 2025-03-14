@@ -14,7 +14,7 @@ import { useRouter } from "@tanstack/react-router"
 
 import type { CreateCharacterDto, UpdateCharacterDto } from "@novelist/models"
 import { useState } from "react"
-import { DynamicFormFieldCreate, DynamicSortableExtendFields, SimpleFormItem, SimpleUpload } from "~/components/form"
+import { DynamicFormField, DynamicFormFieldCreate, DynamicSortableExtendFields } from "~/components/form"
 import { useCharacterForm } from "../hooks/use-character-form"
 
 export interface CharacterFormProps<T extends boolean = false> {
@@ -90,24 +90,14 @@ export default function CharacterForm(props: CharacterFormProps) {
 
         <main className="flex-auto flex mt-3 px-2 gap-x-3">
           <div className="flex-1 space-y-3">
-            <SimpleFormItem
-              name="avatar"
-              label="Character Photo"
-            >
-              <SimpleUpload
-                onError={(e) => {
-                  form.setError("avatar", e[0]?.message || "")
-                }}
-              />
-            </SimpleFormItem>
+            <DynamicFormField type="upload" />
           </div>
           <div className="flex-1 flex flex-col gap-y-3">
-            <SimpleFormItem
+            <DynamicFormField
+              type="input"
               name="name"
-              label="Character Name"
-            >
-              <Input placeholder="Please input your character name..." />
-            </SimpleFormItem>
+              placeholder="Please input your character name..."
+            />
             <DynamicSortableExtendFields
               fields={fields}
               onSwap={swap}

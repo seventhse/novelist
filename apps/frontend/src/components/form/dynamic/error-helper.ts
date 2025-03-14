@@ -1,4 +1,5 @@
 import type { UploadError } from "@novelist/ui"
+import type { DynamicFormFieldType } from "./constant"
 
 export function uploadErrorMessageHelper(errors: UploadError[]) {
   return errors
@@ -17,4 +18,16 @@ export function uploadErrorMessageHelper(errors: UploadError[]) {
       }
     })
     .join(". ")
+}
+
+export function errorHelper(type: DynamicFormFieldType, e: unknown) {
+  switch (type) {
+    case "upload":
+      return uploadErrorMessageHelper(e as UploadError[])
+    default:
+      if (e instanceof Error) {
+        return e.message
+      }
+      return e as string
+  }
 }
